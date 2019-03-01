@@ -8,6 +8,7 @@ let initialState() =
         TodoItems = []
         NewTodoDescription = None
         Visibility = All
+        SortDirection = true
     }
 
     initState, Cmd.ofMsg LoadTodoItems
@@ -41,5 +42,8 @@ let update (msg: Msg) (prevState: State) =
 
     | DeleteTodo id ->
         prevState, Server.deleteTodo id
+    | SwitchSort sortValue -> 
+        let nextState = { prevState with SortDirection = not sortValue }
+        nextState, Cmd.none
 
     | _ -> prevState, Cmd.none

@@ -20,16 +20,18 @@ let renderTodo (item: Todo) dispatch =
 
     div 
       [ ] 
-      [ p [ todoStyle ] [ str item.Description ]
+      [ p [ todoStyle ] [ [ item.Description; item.DateAdded.ToString("dd-MM-yyyy HH:mm:ss") ] |> String.concat " " |> str ]
         button [ ClassName "button is-info"; dispatchToggle ] [ str toggleText ]
         divider
         button [ ClassName "button is-danger"; dispatchDelete ] [ str "Delete" ] ]
+
+let int2string x = sprintf "%i" x    
 
 
 let addTodo (state: State) dispatch = 
   let textValue = defaultArg state.NewTodoDescription ""
   div 
-    [ ClassName "field has-addons"; Style [Padding 5; Width 400] ] 
+    [ ClassName "field has-addons"; Style [Padding 5; Width 800] ] 
     [ div 
         [ ClassName "control is-large" ]
         [ input [ ClassName "input is-large"
@@ -39,17 +41,26 @@ let addTodo (state: State) dispatch =
                   OnChange (fun ev -> dispatch (SetNewTextDescription (!!ev.target?value)))] ] 
       div 
         [ ClassName "control is-large" ]
-        [ button [ ClassName "button is-primary is-large"; OnClick (fun _ -> dispatch AddTodo) ] [ str "Add Todo" ] ] ] 
+        [ button [ ClassName "button is-primary is-large"; OnClick (fun _ -> dispatch AddTodo) ] [ str "Add Todo" ] ] 
+      div
+        [ ClassName "control is-large" ]
+        [ button [ ClassName "button is-primary is-large"; OnClick (fun _ -> dispatch (SwitchSort state.SortDirection))] [ str "Switch Sort" ] ] ] 
  
 let render  (state: State) dispatch = 
-    let sortedTodos = 
-      state.TodoItems 
-      |> List.sortBy (fun todo -> todo.DateAdded) 
-      |> List.map (fun todo -> renderTodo todo dispatch)
+    let sortedTodos sortDirection = 
+      if sortDirection then
+        state.TodoItems 
+        |> List.sortBy (fun todo -> todo.DateAdded) 
+        |> List.map (fun todo -> renderTodo todo dispatch)
+      else
+        state.TodoItems 
+        |> List.sortBy (fun todo -> todo.DateAdded) 
+        |> List.rev
+        |> List.map (fun todo -> renderTodo todo dispatch)
 
     div 
      [ Style [ Padding 20 ] ]
      [ yield h1 [ Style [ FontSize 24 ] ] [ str "SAFE Todo-List" ]
        yield hr [ ]
        yield addTodo state dispatch
-       yield! sortedTodos ]
+       yield! sortedTodos state.SortDirection ]

@@ -12,6 +12,7 @@ type State = {
   TodoItems: List<Todo>
   NewTodoDescription: Option<string> 
   Visibility: Visibility
+  SortDirection: bool
 }
 
 type Msg =
@@ -27,3 +28,4 @@ type Msg =
   | ToggleCompleted of TodoId
   | ToggleCompletedFailure of TodoError
   | SetVisibility of Visibility
+  | SwitchSort of bool
